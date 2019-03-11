@@ -2,11 +2,10 @@ Running the code
 ================
 
  1) open terminal
- 2) cd into 'executables/gentrack_maze_solver_jar'
+ 2) cd into 'gentrack_maze_solver_jar'
  3) run 'java -jar gentrack_maze_solver.jar'
- optional extra: add more maze formats into 'executables/Samples' to test your own mazes
 
-NOTE: if running from src/IDE modify the filepath to locate txt files from correct location
+ add more maze formats into 'Samples' folder to test more mazes
 
 Solving a maze
 ==============

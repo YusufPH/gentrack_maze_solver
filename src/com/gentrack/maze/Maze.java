@@ -5,14 +5,14 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Scanner;
 
-public class maze{
+public class Maze {
 
     private int[][] maze;
     private boolean[][] explored;
     int height;
     int width;
-    private coordinate startCoordinate;
-    private coordinate endCoordinate;
+    private Coordinate startCoordinate;
+    private Coordinate endCoordinate;
 
     private static final int passage = 0;
     private static final int wall = 1;
@@ -20,34 +20,39 @@ public class maze{
     private static final int endPoint = 3;
     private static final int route = 4;
 
-    public maze(File maze) throws FileNotFoundException {
+    public Maze(File maze) throws FileNotFoundException {
         String fileText = "";
-        try (Scanner input = new Scanner(maze)) {
-            while (input.hasNextLine()) {
-                fileText += input.nextLine() + "\n";
+        try (Scanner scanner = new Scanner(maze)) {
+            while (scanner.hasNextLine()) {
+                fileText += scanner.nextLine() + "\n";
             }
         }
         extractMazeInformation(fileText);
     }
 
     private void extractMazeInformation(String text){
+
         if (text == null || (text = text.trim()).length() == 0) {
-            throw new IllegalArgumentException("empty lines data");
+            throw new IllegalArgumentException("incorrect file format: empty text file");
         }
 
         String[] lines = text.split("[\r]?\n");
 
-        String[] dimensions = lines[0].split("\\s+");
+        if(!lines[0].matches("^(\\d+)(\\s)(\\d+)$") || !lines[1].matches("^(\\d+)(\\s)(\\d+)$") || !lines[2].matches("^(\\d+)(\\s)(\\d+)$")) //checks format of dimensions, start and end in the format [int][white space][int]
+        {
+            throw new IllegalArgumentException("incorrect file format: incorrect input format");
+        }
+        String[] dimensions = lines[0].split("\\s+"); // line 1 (index 0) of txt file holds the dimensions of the maze
         width = Integer.parseInt(dimensions[0]);
         height = Integer.parseInt(dimensions[1]);
 
-        String[] start = lines[1].split("\\s+");
-        startCoordinate = new coordinate(Integer.parseInt(start[1]), Integer.parseInt(start[0]));
+        String[] start = lines[1].split("\\s+"); // line 2 (index 1) of txt file holds the start coordinates
+        startCoordinate = new Coordinate(Integer.parseInt(start[1]), Integer.parseInt(start[0]));
 
-        String[] end = lines[2].split("\\s+");
-        endCoordinate = new coordinate(Integer.parseInt(end[1]), Integer.parseInt(end[0]));
+        String[] end = lines[2].split("\\s+"); // line 3 (index 2) of txt file holds the end coordinates
+        endCoordinate = new Coordinate(Integer.parseInt(end[1]), Integer.parseInt(end[0]));
 
-        initializeMaze(lines);
+        initializeMaze(lines); //format the maze object with all its components i.e. walls, passages, start and end point
     }
 
     private void initializeMaze(String[] lines) {
@@ -57,7 +62,8 @@ public class maze{
 
         for(int row = 0; row < height; row++){
             for(int col = 0; col< width; col++){
-                if(lines[row+3].charAt(2*col) == '1'){
+                if(lines[row+3].charAt(2*col) == '1') // row+3 and 2*col due to format of expected txt file -> maze structure starts on line 4 and white space between columns
+                {
                     maze[row][col] = wall;
                 }
                 else{
@@ -70,13 +76,13 @@ public class maze{
         maze[endCoordinate.getX()][endCoordinate.getY()] = endPoint;
     }
 
-    public void printSolution(List<coordinate> route) {
+    public void printSolution(List<Coordinate> route) {
         int[][] tempMaze = this.maze;
-        for (coordinate c : route) {
+        for (Coordinate c : route) {
             if (isStart(c.getX(), c.getY()) || isEnd(c.getX(), c.getY())) {
                 continue;
             }
-            tempMaze[c.getX()][c.getY()] = com.gentrack.maze.maze.route;
+            tempMaze[c.getX()][c.getY()] = Maze.route;
         }
         System.out.println(toString(tempMaze));
     }
@@ -110,7 +116,7 @@ public class maze{
         return width;
     }
 
-    public coordinate getStart() {
+    public Coordinate getStart() {
         return startCoordinate;
     }
 
@@ -130,12 +136,13 @@ public class maze{
         return maze[row][col] == wall;
     }
 
+    //method to identify is wrapping is possible and necessary for a particular movement
     public int isWrappedMovement(int row, int col){
-        if(row < 0) return 0;
-        else if(row >= getHeight()) return 1;
-        else if(col < 0) return 2;
-        else if(col>=getWidth()) return 3;
-        else return 4;
+        if(row < 0) return 0; //wrap when moving North
+        else if(row >= getHeight()) return 1; //wrap when moving South
+        else if(col < 0) return 2; //wrap when moving West
+        else if(col>=getWidth()) return 3; //wrap when moving East
+        else return 4; //No wrapping necessary
     }
 
     public void setExplored(int row, int col, boolean value) {

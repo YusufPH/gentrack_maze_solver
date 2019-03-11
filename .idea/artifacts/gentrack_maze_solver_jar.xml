@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="gentrack_maze_solver:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/gentrack_maze_solver_jar</output-path>
+    <root id="archive" name="gentrack_maze_solver.jar">
+      <element id="module-output" name="gentrack_maze_solver" />
+    </root>
+  </artifact>
+</component>
